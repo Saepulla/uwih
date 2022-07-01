@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eu.faircode.email.ConstraintLayoutEx xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:id="@+id/vSeparatorImages"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="3dp"
+        android:background="?attr/colorSeparator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <eu.faircode.email.FixedImageButton
+        android:id="@+id/ibStoreMedia"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="12dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/title_save_all"
+        android:padding="6dp"
+        android:scaleType="fitCenter"
+        android:tooltipText="@string/title_save_all"
+        app:layout_constraintEnd_toStartOf="@id/ibShareImages"
+        app:layout_constraintTop_toBottomOf="@+id/vSeparatorImages"
+        app:srcCompat="@drawable/twotone_photo_library_24" />
+
+    <eu.faircode.email.FixedImageButton
+        android:id="@+id/ibShareImages"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/title_share"
+        android:padding="6dp"
+        android:scaleType="fitCenter"
+        android:tooltipText="@string/title_share"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vSeparatorImages"
+        app:srcCompat="@drawable/twotone_share_24" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvImage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ibShareImages" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/grpImages"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:constraint_referenced_ids="vSeparatorImages,ibShareImages,rvImage" />
+</eu.faircode.email.ConstraintLayoutEx>

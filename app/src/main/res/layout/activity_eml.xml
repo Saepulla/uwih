@@ -1,0 +1,362 @@
+<eu.faircode.email.ConstraintLayoutEx xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="eu.faircode.email.ActivityEML">
+
+    <eu.faircode.email.ScrollViewEx
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="12dp"
+        android:scrollbarStyle="outsideOverlay"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <eu.faircode.email.ConstraintLayoutEx
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <eu.faircode.email.FixedTextView
+                android:id="@+id/tvHint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:drawableStart="@drawable/twotone_info_24"
+                android:drawablePadding="6dp"
+                android:text="@string/title_hint_eml"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textStyle="italic"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="3dp"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="?attr/colorCardBackground"
+                app:cardCornerRadius="6dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvHint">
+
+                <eu.faircode.email.ConstraintLayoutEx
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="12dp">
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvFromTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_from"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvFrom"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="From"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tvFromTitle"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvToTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_to"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvFrom" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvTo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="To"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tvToTitle"
+                        app:layout_constraintTop_toBottomOf="@id/tvFrom" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvReplyToTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_reply_to"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvTo" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvReplyTo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="Reply to"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tvReplyToTitle"
+                        app:layout_constraintTop_toBottomOf="@id/tvTo" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvCcTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_cc"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvReplyTo" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvCc"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="CC"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tvCcTitle"
+                        app:layout_constraintTop_toBottomOf="@id/tvReplyTo" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvBccTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_bcc"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvCc" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvBcc"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="BCC"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tvBccTitle"
+                        app:layout_constraintTop_toBottomOf="@id/tvCc" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvSentTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_sent"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvBcc" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvSent"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="Sent"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tvSentTitle"
+                        app:layout_constraintTop_toBottomOf="@id/tvBcc" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvReceivedTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_received"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvSent" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvReceived"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="Received"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tvReceivedTitle"
+                        app:layout_constraintTop_toBottomOf="@id/tvSent" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvSubject"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Subject"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        android:textStyle="italic"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvReceived" />
+
+                    <View
+                        android:id="@+id/vSeparatorAttachments"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="3dp"
+                        android:background="?attr/colorSeparator"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvSubject" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvAttachment"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/vSeparatorAttachments" />
+
+                    <View
+                        android:id="@+id/vSeparatorBody"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="3dp"
+                        android:background="?attr/colorSeparator"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/rvAttachment" />
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvBody"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Body"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/vSeparatorBody" />
+
+                </eu.faircode.email.ConstraintLayoutEx>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardStructure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="3dp"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="?attr/colorCardBackground"
+                app:cardCornerRadius="6dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardMessage">
+
+                <eu.faircode.email.ConstraintLayoutEx
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="12dp">
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvStructure"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:fontFamily="monospace"
+                        android:minHeight="30dp"
+                        android:text="Structure"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <eu.faircode.email.FixedImageButton
+                        android:id="@+id/ibEml"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="3dp"
+                        app:layout_constraintBottom_toBottomOf="@id/tvStructure"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:srcCompat="@drawable/baseline_code_24" />
+                </eu.faircode.email.ConstraintLayoutEx>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardHeaders"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="3dp"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="?attr/colorCardBackground"
+                app:cardCornerRadius="6dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardStructure">
+
+                <eu.faircode.email.ConstraintLayoutEx
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="12dp">
+
+                    <eu.faircode.email.FixedTextView
+                        android:id="@+id/tvHeaders"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:fontFamily="monospace"
+                        android:minHeight="30dp"
+                        android:text="Headers"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textIsSelectable="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </eu.faircode.email.ConstraintLayoutEx>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/grpReady"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:constraint_referenced_ids="cardMessage,cardStructure" />
+        </eu.faircode.email.ConstraintLayoutEx>
+    </eu.faircode.email.ScrollViewEx>
+
+    <eu.faircode.email.ContentLoadingProgressBar
+        android:id="@+id/pbWait"
+        style="@style/Base.Widget.AppCompat.ProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</eu.faircode.email.ConstraintLayoutEx>

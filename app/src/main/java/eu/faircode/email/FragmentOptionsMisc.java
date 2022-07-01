@@ -1,0 +1,2017 @@
+package eu.faircode.email;
+
+/*
+    This file is part of FairEmail.
+
+    FairEmail is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FairEmail is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FairEmail.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright 2018-2022 by Marcel Bokhorst (M66B)
+*/
+
+import android.app.ActivityManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PermissionGroupInfo;
+import android.content.pm.PermissionInfo;
+import android.content.res.Resources;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.fonts.Font;
+import android.graphics.fonts.SystemFonts;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Debug;
+import android.os.Environment;
+import android.provider.Settings;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
+import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.Group;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.Observer;
+import androidx.preference.PreferenceManager;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.SortedMap;
+
+import io.requery.android.database.sqlite.SQLiteDatabase;
+
+public class FragmentOptionsMisc extends FragmentBase implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private boolean resumed = false;
+    private List<Pair<String, String>> languages = new ArrayList<>();
+
+    private ImageButton ibHelp;
+    private SwitchCompat swPowerMenu;
+    private SwitchCompat swExternalSearch;
+    private SwitchCompat swSortAnswers;
+    private SwitchCompat swExternalAnswer;
+    private SwitchCompat swShortcuts;
+    private SwitchCompat swFts;
+    private SwitchCompat swClassification;
+    private TextView tvClassMinProbability;
+    private SeekBar sbClassMinProbability;
+    private TextView tvClassMinDifference;
+    private SeekBar sbClassMinDifference;
+    private ImageButton ibClassification;
+    private TextView tvFtsIndexed;
+    private TextView tvFtsPro;
+    private Spinner spLanguage;
+    private ImageButton ibResetLanguage;
+    private SwitchCompat swDeepL;
+    private ImageButton ibDeepL;
+    private TextView tvSdcard;
+    private SwitchCompat swUpdates;
+    private ImageButton ibChannelUpdated;
+    private SwitchCompat swCheckWeekly;
+    private SwitchCompat swChangelog;
+    private SwitchCompat swCrashReports;
+    private TextView tvUuid;
+    private Button btnReset;
+    private SwitchCompat swCleanupAttachments;
+    private Button btnCleanup;
+    private TextView tvLastCleanup;
+
+    private CardView cardAdvanced;
+    private SwitchCompat swWatchdog;
+    private SwitchCompat swExperiments;
+    private TextView tvExperimentsHint;
+    private SwitchCompat swProtocol;
+    private SwitchCompat swLogInfo;
+    private SwitchCompat swDebug;
+    private SwitchCompat swCanary;
+    private SwitchCompat swTest1;
+    private SwitchCompat swTest2;
+    private SwitchCompat swTest3;
+    private SwitchCompat swTest4;
+    private SwitchCompat swTest5;
+
+    private Button btnRepair;
+    private SwitchCompat swAutostart;
+    private SwitchCompat swWorkManager;
+    private SwitchCompat swExternalStorage;
+    private TextView tvExternalStorageFolder;
+    private TextView tvRoomQueryThreads;
+    private SeekBar sbRoomQueryThreads;
+    private ImageButton ibRoom;
+    private SwitchCompat swWal;
+    private SwitchCompat swCheckpoints;
+    private SwitchCompat swAnalyze;
+    private TextView tvSqliteCache;
+    private SeekBar sbSqliteCache;
+    private TextView tvChunkSize;
+    private SeekBar sbChunkSize;
+    private TextView tvThreadRange;
+    private SeekBar sbThreadRange;
+    private ImageButton ibSqliteCache;
+    private SwitchCompat swUndoManager;
+    private SwitchCompat swWebViewLegacy;
+    private SwitchCompat swBrowserZoom;
+    private SwitchCompat swModSeq;
+    private SwitchCompat swUid;
+    private SwitchCompat swExpunge;
+    private SwitchCompat swUidExpunge;
+    private SwitchCompat swAuthPlain;
+    private SwitchCompat swAuthLogin;
+    private SwitchCompat swAuthNtlm;
+    private SwitchCompat swAuthSasl;
+    private SwitchCompat swAuthApop;
+    private SwitchCompat swKeepAlivePoll;
+    private SwitchCompat swEmptyPool;
+    private SwitchCompat swIdleDone;
+    private SwitchCompat swLogarithmicBackoff;
+    private SwitchCompat swExactAlarms;
+    private SwitchCompat swInfra;
+    private SwitchCompat swDupMsgId;
+    private SwitchCompat swTestIab;
+    private Button btnImportProviders;
+    private TextView tvProcessors;
+    private TextView tvMemoryClass;
+    private TextView tvMemoryUsage;
+    private TextView tvStorageUsage;
+    private TextView tvCacheUsage;
+    private TextView tvContactInfo;
+    private TextView tvSuffixes;
+    private TextView tvAndroidId;
+    private TextView tvFingerprint;
+    private TextView tvCursorWindow;
+    private Button btnGC;
+    private Button btnCharsets;
+    private Button btnFontMap;
+    private Button btnCiphers;
+    private Button btnFiles;
+    private Button btnAllPermissions;
+    private TextView tvPermissions;
+
+    private Group grpUpdates;
+    private Group grpTest;
+    private CardView cardDebug;
+
+    private NumberFormat NF = NumberFormat.getNumberInstance();
+
+    private final static long MIN_FILE_SIZE = 1024 * 1024L;
+
+    private final static String[] RESET_OPTIONS = new String[]{
+            "sort_answers", "shortcuts", "fts",
+            "classification", "class_min_probability", "class_min_difference",
+            "language", "deepl_enabled",
+            "updates", "weekly", "show_changelog",
+            "crash_reports", "cleanup_attachments",
+            "watchdog", "experiments", "protocol", "log_level", "debug", "leak_canary", "test1",
+            "test2", "test3", "test4", "test5",
+            "work_manager", // "external_storage",
+            "query_threads", "wal", "sqlite_checkpoints", "sqlite_analyze", "sqlite_cache",
+            "chunk_size", "thread_range", "undo_manager", "webview_legacy", "browser_zoom",
+            "use_modseq", "uid_command", "perform_expunge", "uid_expunge",
+            "auth_plain", "auth_login", "auth_ntlm", "auth_sasl", "auth_apop",
+            "keep_alive_poll", "empty_pool", "idle_done", "logarithmic_backoff",
+            "exact_alarms", "infra", "dkim_verify", "dup_msgids", "test_iab"
+    };
+
+    private final static String[] RESET_QUESTIONS = new String[]{
+            "first", "app_support", "notify_archive",
+            "message_swipe", "message_select", "message_junk",
+            "folder_actions", "folder_sync",
+            "crash_reports_asked", "review_asked", "review_later", "why",
+            "reply_hint", "html_always_images", "open_full_confirmed", "open_amp_confirmed",
+            "ask_images", "ask_html",
+            "print_html_confirmed", "print_html_header", "print_html_images",
+            "reformatted_hint",
+            "selected_folders", "move_1_confirmed", "move_n_confirmed",
+            "last_search_senders", "last_search_recipients", "last_search_subject", "last_search_keywords", "last_search_message",
+            "identities_asked", "identities_primary_hint",
+            "raw_asked", "all_read_asked", "delete_asked",
+            "cc_bcc", "inline_image_hint", "compose_reference", "send_dialog",
+            "setup_reminder", "setup_advanced",
+            "signature_images_hint",
+            "gmail_checked",
+            "eml_auto_confirm"
+    };
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Locale slocale = Resources.getSystem().getConfiguration().locale;
+        for (String tag : getResources().getAssets().getLocales())
+            languages.add(new Pair<>(tag, Locale.forLanguageTag(tag).getDisplayName(slocale)));
+
+        Collections.sort(languages, new Comparator<Pair<String, String>>() {
+            @Override
+            public int compare(Pair<String, String> l1, Pair<String, String> l2) {
+                return l1.second.compareTo(l2.second);
+            }
+        });
+    }
+
+    @Override
+    @Nullable
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setSubtitle(R.string.title_setup);
+        setHasOptionsMenu(true);
+
+        View view = inflater.inflate(R.layout.fragment_options_misc, container, false);
+
+        // Get controls
+
+        ibHelp = view.findViewById(R.id.ibHelp);
+        swPowerMenu = view.findViewById(R.id.swPowerMenu);
+        swExternalSearch = view.findViewById(R.id.swExternalSearch);
+        swSortAnswers = view.findViewById(R.id.swSortAnswers);
+        swExternalAnswer = view.findViewById(R.id.swExternalAnswer);
+        swShortcuts = view.findViewById(R.id.swShortcuts);
+        swFts = view.findViewById(R.id.swFts);
+        swClassification = view.findViewById(R.id.swClassification);
+        ibClassification = view.findViewById(R.id.ibClassification);
+        tvClassMinProbability = view.findViewById(R.id.tvClassMinProbability);
+        sbClassMinProbability = view.findViewById(R.id.sbClassMinProbability);
+        tvClassMinDifference = view.findViewById(R.id.tvClassMinDifference);
+        sbClassMinDifference = view.findViewById(R.id.sbClassMinDifference);
+        tvFtsIndexed = view.findViewById(R.id.tvFtsIndexed);
+        tvFtsPro = view.findViewById(R.id.tvFtsPro);
+        spLanguage = view.findViewById(R.id.spLanguage);
+        ibResetLanguage = view.findViewById(R.id.ibResetLanguage);
+        swDeepL = view.findViewById(R.id.swDeepL);
+        ibDeepL = view.findViewById(R.id.ibDeepL);
+        tvSdcard = view.findViewById(R.id.tvSdcard);
+        swUpdates = view.findViewById(R.id.swUpdates);
+        ibChannelUpdated = view.findViewById(R.id.ibChannelUpdated);
+        swCheckWeekly = view.findViewById(R.id.swWeekly);
+        swChangelog = view.findViewById(R.id.swChangelog);
+        swCrashReports = view.findViewById(R.id.swCrashReports);
+        tvUuid = view.findViewById(R.id.tvUuid);
+        btnReset = view.findViewById(R.id.btnReset);
+        swCleanupAttachments = view.findViewById(R.id.swCleanupAttachments);
+        btnCleanup = view.findViewById(R.id.btnCleanup);
+        tvLastCleanup = view.findViewById(R.id.tvLastCleanup);
+
+        cardAdvanced = view.findViewById(R.id.cardAdvanced);
+        swWatchdog = view.findViewById(R.id.swWatchdog);
+        swExperiments = view.findViewById(R.id.swExperiments);
+        tvExperimentsHint = view.findViewById(R.id.tvExperimentsHint);
+        swProtocol = view.findViewById(R.id.swProtocol);
+        swLogInfo = view.findViewById(R.id.swLogInfo);
+        swDebug = view.findViewById(R.id.swDebug);
+        swCanary = view.findViewById(R.id.swCanary);
+        swTest1 = view.findViewById(R.id.swTest1);
+        swTest2 = view.findViewById(R.id.swTest2);
+        swTest3 = view.findViewById(R.id.swTest3);
+        swTest4 = view.findViewById(R.id.swTest4);
+        swTest5 = view.findViewById(R.id.swTest5);
+
+        btnRepair = view.findViewById(R.id.btnRepair);
+        swAutostart = view.findViewById(R.id.swAutostart);
+        swWorkManager = view.findViewById(R.id.swWorkManager);
+        swExternalStorage = view.findViewById(R.id.swExternalStorage);
+        tvExternalStorageFolder = view.findViewById(R.id.tvExternalStorageFolder);
+        tvRoomQueryThreads = view.findViewById(R.id.tvRoomQueryThreads);
+        sbRoomQueryThreads = view.findViewById(R.id.sbRoomQueryThreads);
+        ibRoom = view.findViewById(R.id.ibRoom);
+        swWal = view.findViewById(R.id.swWal);
+        swCheckpoints = view.findViewById(R.id.swCheckpoints);
+        swAnalyze = view.findViewById(R.id.swAnalyze);
+        tvSqliteCache = view.findViewById(R.id.tvSqliteCache);
+        sbSqliteCache = view.findViewById(R.id.sbSqliteCache);
+        ibSqliteCache = view.findViewById(R.id.ibSqliteCache);
+        tvChunkSize = view.findViewById(R.id.tvChunkSize);
+        sbChunkSize = view.findViewById(R.id.sbChunkSize);
+        tvThreadRange = view.findViewById(R.id.tvThreadRange);
+        sbThreadRange = view.findViewById(R.id.sbThreadRange);
+        swUndoManager = view.findViewById(R.id.swUndoManager);
+        swWebViewLegacy = view.findViewById(R.id.swWebViewLegacy);
+        swBrowserZoom = view.findViewById(R.id.swBrowserZoom);
+        swModSeq = view.findViewById(R.id.swModSeq);
+        swUid = view.findViewById(R.id.swUid);
+        swExpunge = view.findViewById(R.id.swExpunge);
+        swUidExpunge = view.findViewById(R.id.swUidExpunge);
+        swAuthPlain = view.findViewById(R.id.swAuthPlain);
+        swAuthLogin = view.findViewById(R.id.swAuthLogin);
+        swAuthNtlm = view.findViewById(R.id.swAuthNtlm);
+        swAuthSasl = view.findViewById(R.id.swAuthSasl);
+        swAuthApop = view.findViewById(R.id.swAuthApop);
+        swKeepAlivePoll = view.findViewById(R.id.swKeepAlivePoll);
+        swEmptyPool = view.findViewById(R.id.swEmptyPool);
+        swIdleDone = view.findViewById(R.id.swIdleDone);
+        swLogarithmicBackoff = view.findViewById(R.id.swLogarithmicBackoff);
+        swExactAlarms = view.findViewById(R.id.swExactAlarms);
+        swInfra = view.findViewById(R.id.swInfra);
+        swDupMsgId = view.findViewById(R.id.swDupMsgId);
+        swTestIab = view.findViewById(R.id.swTestIab);
+        btnImportProviders = view.findViewById(R.id.btnImportProviders);
+        tvProcessors = view.findViewById(R.id.tvProcessors);
+        tvMemoryClass = view.findViewById(R.id.tvMemoryClass);
+        tvMemoryUsage = view.findViewById(R.id.tvMemoryUsage);
+        tvStorageUsage = view.findViewById(R.id.tvStorageUsage);
+        tvCacheUsage = view.findViewById(R.id.tvCacheUsage);
+        tvContactInfo = view.findViewById(R.id.tvContactInfo);
+        tvSuffixes = view.findViewById(R.id.tvSuffixes);
+        tvAndroidId = view.findViewById(R.id.tvAndroidId);
+        tvFingerprint = view.findViewById(R.id.tvFingerprint);
+        tvCursorWindow = view.findViewById(R.id.tvCursorWindow);
+        btnGC = view.findViewById(R.id.btnGC);
+        btnCharsets = view.findViewById(R.id.btnCharsets);
+        btnFontMap = view.findViewById(R.id.btnFontMap);
+        btnCiphers = view.findViewById(R.id.btnCiphers);
+        btnFiles = view.findViewById(R.id.btnFiles);
+        btnAllPermissions = view.findViewById(R.id.btnAllPermissions);
+        tvPermissions = view.findViewById(R.id.tvPermissions);
+
+        grpUpdates = view.findViewById(R.id.grpUpdates);
+        grpTest = view.findViewById(R.id.grpTest);
+        cardDebug = view.findViewById(R.id.cardDebug);
+
+        setOptions();
+
+        // Wire controls
+
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        ibHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Helper.view(v.getContext(), Helper.getSupportUri(v.getContext(), "Options:misc"), false);
+            }
+        });
+
+        swPowerMenu.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+                    Helper.enableComponent(getContext(), ServicePowerControl.class, checked);
+            }
+        });
+
+        swExternalSearch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                Helper.enableComponent(getContext(), ActivitySearch.class, checked);
+            }
+        });
+
+        swSortAnswers.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("sort_answers", checked).apply();
+            }
+        });
+
+        swExternalAnswer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                Helper.enableComponent(getContext(), ActivityAnswer.class, checked);
+            }
+        });
+
+        swShortcuts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("shortcuts", checked).commit(); // apply won't work here
+            }
+        });
+
+        swFts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("fts", checked).apply();
+
+                WorkerFts.init(getContext(), true);
+
+                if (!checked) {
+                    Bundle args = new Bundle();
+
+                    new SimpleTask<Void>() {
+                        @Override
+                        protected Void onExecute(Context context, Bundle args) {
+                            try {
+                                SQLiteDatabase sdb = FtsDbHelper.getInstance(context);
+                                FtsDbHelper.delete(sdb);
+                                FtsDbHelper.optimize(sdb);
+                            } catch (SQLiteDatabaseCorruptException ex) {
+                                Log.e(ex);
+                                FtsDbHelper.delete(context);
+                            }
+
+                            DB db = DB.getInstance(context);
+                            db.message().resetFts();
+
+                            return null;
+                        }
+
+                        @Override
+                        protected void onException(Bundle args, Throwable ex) {
+                            Log.unexpectedError(getParentFragmentManager(), ex);
+                        }
+                    }.execute(FragmentOptionsMisc.this, args, "fts:reset");
+                }
+            }
+        });
+
+        Helper.linkPro(tvFtsPro);
+
+        swClassification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            private int count = 0;
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean checked) {
+                prefs.edit().putBoolean("classification", checked).apply();
+                if (!checked) {
+                    count++;
+                    if (count >= 3) {
+                        count = 0;
+                        MessageClassifier.clear(buttonView.getContext());
+                        ToastEx.makeText(buttonView.getContext(), R.string.title_reset, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+
+        ibClassification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Helper.viewFAQ(v.getContext(), 163);
+            }
+        });
+
+        sbClassMinProbability.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                prefs.edit().putInt("class_min_probability", progress).apply();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+        });
+
+        sbClassMinDifference.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                prefs.edit().putInt("class_min_difference", progress).apply();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+        });
+
+        spLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                if (position == 0)
+                    onNothingSelected(adapterView);
+                else {
+                    String tag = languages.get(position - 1).first;
+                    if (tag.equals(spLanguage.getTag()))
+                        return;
+
+                    new AlertDialog.Builder(view.getContext())
+                            .setIcon(R.drawable.twotone_help_24)
+                            .setTitle(languages.get(position - 1).second)
+                            .setMessage(R.string.title_advanced_english_hint)
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    prefs.edit().putString("language", tag).commit(); // apply won't work here
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Do nothing
+                                }
+                            })
+                            .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    setOptions();
+                                }
+                            })
+                            .show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                prefs.edit().remove("language").commit(); // apply won't work here
+            }
+        });
+
+        ibResetLanguage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Locale system = Resources.getSystem().getConfiguration().locale;
+                new AlertDialog.Builder(v.getContext())
+                        .setIcon(R.drawable.twotone_help_24)
+                        .setTitle(system.getDisplayName(system))
+                        .setMessage(Helper.getString(v.getContext(), system, R.string.title_advanced_english_hint))
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                prefs.edit().remove("language").commit(); // apply won't work here
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
+                            }
+                        })
+                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                setOptions();
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        swDeepL.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("deepl_enabled", checked).apply();
+            }
+        });
+
+        ibDeepL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Helper.viewFAQ(v.getContext(), 167, true);
+            }
+        });
+
+        tvSdcard.setPaintFlags(tvSdcard.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        tvSdcard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Helper.viewFAQ(v.getContext(), 93);
+            }
+        });
+
+        swUpdates.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("updates", checked).apply();
+                swCheckWeekly.setEnabled(checked);
+                if (!checked) {
+                    NotificationManager nm =
+                            (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    nm.cancel(NotificationHelper.NOTIFICATION_UPDATE);
+                }
+            }
+        });
+
+        final Intent channelUpdate = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getPackageName())
+                .putExtra(Settings.EXTRA_CHANNEL_ID, "update");
+
+        ibChannelUpdated.setVisibility(View.GONE);
+        ibChannelUpdated.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.getContext().startActivity(channelUpdate);
+            }
+        });
+
+        swCheckWeekly.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("weekly", checked).apply();
+            }
+        });
+
+        swChangelog.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("show_changelog", checked).apply();
+            }
+        });
+
+        swCrashReports.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit()
+                        .remove("crash_report_count")
+                        .putBoolean("crash_reports", checked)
+                        .apply();
+                Log.setCrashReporting(checked);
+            }
+        });
+
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onResetQuestions();
+            }
+        });
+
+        swCleanupAttachments.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("cleanup_attachments", checked).apply();
+            }
+        });
+
+        btnCleanup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onCleanup();
+            }
+        });
+
+        swWatchdog.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("watchdog", checked).apply();
+            }
+        });
+
+        tvExperimentsHint.setPaintFlags(tvExperimentsHint.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        tvExperimentsHint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Helper.viewFAQ(v.getContext(), 125);
+            }
+        });
+
+        swExperiments.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("experiments", checked).apply();
+            }
+        });
+
+        swProtocol.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("protocol", checked).apply();
+                if (checked)
+                    prefs.edit()
+                            .putLong("protocol_since", new Date().getTime())
+                            .putInt("log_level", android.util.Log.INFO)
+                            .apply();
+                else
+                    EntityLog.clear(compoundButton.getContext());
+            }
+        });
+
+        swLogInfo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putInt("log_level", checked ? android.util.Log.INFO : android.util.Log.WARN).apply();
+            }
+        });
+
+        swDebug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("debug", checked).apply();
+                cardDebug.setVisibility(checked || BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+                if (checked)
+                    view.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                view.scrollTo(0, cardAdvanced.getTop() + swDebug.getTop());
+                            } catch (Throwable ex) {
+                                Log.e(ex);
+                            }
+                        }
+                    });
+            }
+        });
+
+        swCanary.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+        swCanary.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("leak_canary", checked).apply();
+                CoalMine.setup(checked);
+            }
+        });
+
+        swTest1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("test1", checked).apply();
+            }
+        });
+
+        swTest2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("test2", checked).apply();
+            }
+        });
+
+        swTest3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("test3", checked).apply();
+            }
+        });
+
+        swTest4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("test4", checked).apply();
+            }
+        });
+
+        swTest5.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("test5", checked).apply();
+            }
+        });
+
+        btnRepair.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(view.getContext())
+                        .setIcon(R.drawable.twotone_bug_report_24)
+                        .setTitle(R.string.title_advanced_repair)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new SimpleTask<Void>() {
+                                    @Override
+                                    protected void onPostExecute(Bundle args) {
+                                        prefs.edit().remove("debug").apply();
+                                    }
+
+                                    @Override
+                                    protected Void onExecute(Context context, Bundle args) throws Throwable {
+                                        DB db = DB.getInstance(context);
+
+                                        List<EntityAccount> accounts = db.account().getAccounts();
+                                        if (accounts == null)
+                                            return null;
+
+                                        for (EntityAccount account : accounts) {
+                                            if (account.protocol != EntityAccount.TYPE_IMAP)
+                                                continue;
+
+                                            List<EntityFolder> folders = db.folder().getFolders(account.id, false, false);
+                                            if (folders == null)
+                                                continue;
+
+                                            EntityFolder inbox = db.folder().getFolderByType(account.id, EntityFolder.INBOX);
+                                            for (EntityFolder folder : folders) {
+                                                if (inbox == null && "inbox".equalsIgnoreCase(folder.name))
+                                                    folder.type = EntityFolder.INBOX;
+
+                                                if (!EntityFolder.USER.equals(folder.type) &&
+                                                        !EntityFolder.SYSTEM.equals(folder.type)) {
+                                                    EntityLog.log(context, "Repairing " + account.name + ":" + folder.type);
+                                                    folder.setProperties();
+                                                    folder.setSpecials(account);
+                                                    db.folder().updateFolder(folder);
+                                                }
+                                            }
+                                        }
+
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onExecuted(Bundle args, Void data) {
+                                        ToastEx.makeText(v.getContext(), R.string.title_completed, Toast.LENGTH_LONG).show();
+                                        ServiceSynchronize.reload(v.getContext(), null, true, "repair");
+                                    }
+
+                                    @Override
+                                    protected void onException(Bundle args, Throwable ex) {
+                                        Log.unexpectedError(getParentFragmentManager(), ex);
+                                    }
+                                }.execute(FragmentOptionsMisc.this, new Bundle(), "repair");
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
+                            }
+                        })
+                        .show();
+            }
+
+        });
+
+        swAutostart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton v, boolean checked) {
+                Helper.enableComponent(v.getContext(), ReceiverAutoStart.class, checked);
+            }
+        });
+
+        swWorkManager.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                prefs.edit().putBoolean("work_manager", isChecked).apply();
+            }
+        });
+
+        swExternalStorage.setEnabled(getContext().getExternalFilesDir(null) != null);
+        swExternalStorage.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                prefs.edit().putBoolean("external_storage", isChecked).apply();
+
+                Bundle args = new Bundle();
+                args.putBoolean("external_storage", isChecked);
+
+                new SimpleTask<Integer>() {
+                    @Override
+                    protected Integer onExecute(Context context, Bundle args) throws IOException {
+                        boolean external_storage = args.getBoolean("external_storage");
+
+                        File source = (!external_storage
+                                ? context.getExternalFilesDir(null)
+                                : context.getFilesDir());
+
+                        File target = (external_storage
+                                ? context.getExternalFilesDir(null)
+                                : context.getFilesDir());
+
+                        source = new File(source, "attachments");
+                        target = new File(target, "attachments");
+
+                        source.mkdirs();
+                        target.mkdirs();
+
+                        File[] attachments = source.listFiles();
+                        if (attachments != null)
+                            for (File attachment : attachments) {
+                                File dest = new File(target, attachment.getName());
+                                Log.i("Move " + attachment + " to " + dest);
+                                Helper.copy(attachment, dest);
+                                attachment.delete();
+                            }
+
+                        return (attachments == null ? -1 : attachments.length);
+                    }
+
+                    @Override
+                    protected void onExecuted(Bundle args, Integer count) {
+                        String msg = String.format("Moved %d attachments", count);
+                        ToastEx.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    protected void onException(Bundle args, Throwable ex) {
+                        Log.unexpectedError(getParentFragmentManager(), ex);
+                    }
+                }.execute(FragmentOptionsMisc.this, args, "external");
+            }
+        });
+
+        sbRoomQueryThreads.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                prefs.edit().putInt("query_threads", progress).apply();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+        });
+
+        ibRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                prefs.edit().remove("debug").commit();
+                ApplicationEx.restart(v.getContext());
+            }
+        });
+
+        swWal.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("wal", checked).commit(); // apply won't work here
+            }
+        });
+
+        swCheckpoints.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("sqlite_checkpoints", checked).apply();
+            }
+        });
+
+        swAnalyze.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("sqlite_analyze", checked).apply();
+            }
+        });
+
+        sbSqliteCache.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                prefs.edit().putInt("sqlite_cache", progress).apply();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+        });
+
+        ibSqliteCache.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                prefs.edit().remove("debug").commit();
+                ApplicationEx.restart(v.getContext());
+            }
+        });
+
+        sbChunkSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progress = progress / 10;
+                if (progress < 1)
+                    progress = 1;
+                progress = progress * 10;
+                prefs.edit().putInt("chunk_size", progress).apply();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+        });
+
+        sbThreadRange.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                prefs.edit().putInt("thread_range", progress).apply();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Do nothing
+            }
+        });
+
+        swUndoManager.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("undo_manager", checked).apply();
+            }
+        });
+
+        swWebViewLegacy.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("webview_legacy", checked).apply();
+            }
+        });
+
+        swBrowserZoom.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+        swBrowserZoom.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("browser_zoom", checked).apply();
+            }
+        });
+
+        swModSeq.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("use_modseq", checked).apply();
+                ServiceSynchronize.reload(compoundButton.getContext(), null, true, "use_modseq");
+            }
+        });
+
+        swUid.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("uid_command", checked).apply();
+                System.setProperty("fairemail.uid_command", Boolean.toString(checked));
+                ServiceSynchronize.reload(compoundButton.getContext(), null, true, "uid_command");
+            }
+        });
+
+        swExpunge.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("perform_expunge", checked).apply();
+                ServiceSynchronize.reload(compoundButton.getContext(), null, true, "perform_expunge");
+            }
+        });
+
+        swUidExpunge.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("uid_expunge", checked).apply();
+                ServiceSynchronize.reload(compoundButton.getContext(), null, true, "uid_expunge");
+            }
+        });
+
+        swAuthPlain.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("auth_plain", checked).apply();
+            }
+        });
+
+        swAuthLogin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("auth_login", checked).apply();
+            }
+        });
+
+        swAuthNtlm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("auth_ntlm", checked).apply();
+            }
+        });
+
+        swAuthSasl.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("auth_sasl", checked).apply();
+            }
+        });
+
+        swAuthApop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("auth_apop", checked).apply();
+            }
+        });
+
+        swKeepAlivePoll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("keep_alive_poll", checked).apply();
+            }
+        });
+
+        swEmptyPool.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("empty_pool", checked).apply();
+            }
+        });
+
+        swIdleDone.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("idle_done", checked).apply();
+            }
+        });
+
+        swLogarithmicBackoff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("logarithmic_backoff", checked).apply();
+            }
+        });
+
+        swExactAlarms.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("exact_alarms", checked).apply();
+            }
+        });
+
+        swInfra.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("infra", checked).apply();
+            }
+        });
+
+        swDupMsgId.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("dup_msgids", checked).apply();
+            }
+        });
+
+        swTestIab.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                prefs.edit().putBoolean("test_iab", checked).apply();
+            }
+        });
+
+        btnImportProviders.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                Intent choose = Helper.getChooser(v.getContext(), intent);
+                getActivity().startActivityForResult(choose, ActivitySetup.REQUEST_IMPORT_PROVIDERS);
+            }
+        });
+
+        btnGC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Helper.gc();
+                DB.shrinkMemory(v.getContext());
+            }
+        });
+
+        btnCharsets.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new SimpleTask<SortedMap<String, Charset>>() {
+                    @Override
+                    protected void onPreExecute(Bundle args) {
+                        btnCharsets.setEnabled(false);
+                    }
+
+                    @Override
+                    protected void onPostExecute(Bundle args) {
+                        btnCharsets.setEnabled(true);
+                    }
+
+                    @Override
+                    protected SortedMap<String, Charset> onExecute(Context context, Bundle args) {
+                        return Charset.availableCharsets();
+                    }
+
+                    @Override
+                    protected void onExecuted(Bundle args, SortedMap<String, Charset> charsets) {
+                        StringBuilder sb = new StringBuilder();
+                        for (String key : charsets.keySet())
+                            sb.append(charsets.get(key).displayName()).append("\r\n");
+                        new AlertDialog.Builder(getContext())
+                                .setIcon(R.drawable.twotone_info_24)
+                                .setTitle(R.string.title_advanced_charsets)
+                                .setMessage(sb.toString())
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Do nothing
+                                    }
+                                })
+                                .show();
+                    }
+
+                    @Override
+                    protected void onException(Bundle args, Throwable ex) {
+                        Log.unexpectedError(getParentFragmentManager(), ex);
+                    }
+                }.execute(FragmentOptionsMisc.this, new Bundle(), "setup:charsets");
+            }
+        });
+
+        btnFontMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SpannableStringBuilder ssb = new SpannableStringBuilderEx();
+
+                try {
+                    Typeface typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL);
+                    Field f = Typeface.class.getDeclaredField("sSystemFontMap");
+                    f.setAccessible(true);
+                    Map<String, Typeface> sSystemFontMap = (Map<String, Typeface>) f.get(typeface);
+                    for (String key : sSystemFontMap.keySet())
+                        ssb.append(key).append("\n");
+                } catch (Throwable ex) {
+                    ssb.append(ex.toString());
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ssb.append("\n");
+                    for (Font font : SystemFonts.getAvailableFonts())
+                        ssb.append(font.getFile().getName()).append("\n");
+                }
+
+                new AlertDialog.Builder(getContext())
+                        .setIcon(R.drawable.twotone_info_24)
+                        .setTitle(R.string.title_advanced_font_map)
+                        .setMessage(ssb)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        btnCiphers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(getContext())
+                        .setIcon(R.drawable.twotone_info_24)
+                        .setTitle(R.string.title_advanced_ciphers)
+                        .setMessage(Log.getCiphers())
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        final String title = getString(R.string.title_advanced_files, Helper.humanReadableByteCount(MIN_FILE_SIZE));
+        btnFiles.setText(title);
+
+        btnFiles.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new SimpleTask<List<File>>() {
+                    @Override
+                    protected void onPreExecute(Bundle args) {
+                        btnFiles.setEnabled(false);
+                    }
+
+                    @Override
+                    protected void onPostExecute(Bundle args) {
+                        btnFiles.setEnabled(true);
+                    }
+
+                    @Override
+                    protected List<File> onExecute(Context context, Bundle args) {
+                        List<File> files = new ArrayList<>();
+                        files.addAll(getFiles(context.getFilesDir(), MIN_FILE_SIZE));
+                        files.addAll(getFiles(context.getCacheDir(), MIN_FILE_SIZE));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                            files.addAll(getFiles(context.getDataDir(), MIN_FILE_SIZE));
+                        files.addAll(getFiles(context.getExternalFilesDir(null), MIN_FILE_SIZE));
+
+                        Collections.sort(files, new Comparator<File>() {
+                            @Override
+                            public int compare(File f1, File f2) {
+                                return -Long.compare(f1.length(), f2.length());
+                            }
+                        });
+                        return files;
+                    }
+
+                    private List<File> getFiles(File dir, long minSize) {
+                        List<File> files = new ArrayList<>();
+                        if (dir != null) {
+                            File[] listed = dir.listFiles();
+                            if (listed != null)
+                                for (File file : listed)
+                                    if (file.isDirectory())
+                                        files.addAll(getFiles(file, minSize));
+                                    else if (file.length() > minSize)
+                                        files.add(file);
+                        }
+                        return files;
+                    }
+
+                    @Override
+                    protected void onExecuted(Bundle args, List<File> files) {
+                        SpannableStringBuilder ssb = new SpannableStringBuilderEx();
+
+                        final Context context = getContext();
+                        File dataDir = (Build.VERSION.SDK_INT < Build.VERSION_CODES.N
+                                ? null : context.getDataDir());
+                        File filesDir = context.getFilesDir();
+                        File cacheDir = context.getCacheDir();
+                        File externalDir = context.getExternalFilesDir(null);
+
+                        if (dataDir != null)
+                            ssb.append("Data: ").append(dataDir.getAbsolutePath()).append("\r\n");
+                        if (filesDir != null)
+                            ssb.append("Files: ").append(filesDir.getAbsolutePath()).append("\r\n");
+                        if (cacheDir != null)
+                            ssb.append("Cache: ").append(cacheDir.getAbsolutePath()).append("\r\n");
+                        if (externalDir != null)
+                            ssb.append("External: ").append(externalDir.getAbsolutePath()).append("\r\n");
+                        ssb.append("\r\n");
+
+                        for (File file : files) {
+                            int start = ssb.length();
+                            ssb.append(Helper.humanReadableByteCount(file.length()));
+                            ssb.setSpan(new StyleSpan(Typeface.BOLD), start, ssb.length(), 0);
+                            ssb.append(' ')
+                                    .append(file.getAbsolutePath())
+                                    .append("\r\n");
+                        }
+
+                        ssb.setSpan(new RelativeSizeSpan(HtmlHelper.FONT_SMALL), 0, ssb.length(), 0);
+
+                        new AlertDialog.Builder(context)
+                                .setIcon(R.drawable.twotone_info_24)
+                                .setTitle(title)
+                                .setMessage(ssb)
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Do nothing
+                                    }
+                                })
+                                .show();
+                    }
+
+                    @Override
+                    protected void onException(Bundle args, Throwable ex) {
+                        Log.unexpectedError(getParentFragmentManager(), ex);
+                    }
+                }.execute(FragmentOptionsMisc.this, new Bundle(), "setup:files");
+            }
+        });
+
+        btnAllPermissions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new SimpleTask<Spanned>() {
+                    @Override
+                    protected Spanned onExecute(Context context, Bundle args) throws Throwable {
+                        SpannableStringBuilder ssb = new SpannableStringBuilderEx();
+
+                        PackageManager pm = context.getPackageManager();
+                        List<PermissionGroupInfo> groups = pm.getAllPermissionGroups(0);
+                        groups.add(0, null); // Ungrouped
+
+                        for (PermissionGroupInfo group : groups) {
+                            String name = (group == null ? null : group.name);
+                            int start = ssb.length();
+                            ssb.append(name == null ? "Ungrouped" : name);
+                            ssb.setSpan(new StyleSpan(Typeface.BOLD), start, ssb.length(), 0);
+                            ssb.append("\n\n");
+
+                            try {
+                                for (PermissionInfo permission : pm.queryPermissionsByGroup(name, 0)) {
+                                    start = ssb.length();
+                                    ssb.append(permission.name);
+                                    ssb.setSpan(new RelativeSizeSpan(HtmlHelper.FONT_SMALL), start, ssb.length(), 0);
+                                    ssb.append("\n");
+                                }
+                            } catch (PackageManager.NameNotFoundException ex) {
+                                ssb.append(ex.toString()).append("\n")
+                                        .append(android.util.Log.getStackTraceString(ex)).append("\n");
+                            }
+
+                            ssb.append("\n");
+                        }
+
+                        return ssb;
+                    }
+
+                    @Override
+                    protected void onExecuted(Bundle args, Spanned ssb) {
+                        new AlertDialog.Builder(v.getContext())
+                                .setIcon(R.drawable.twotone_info_24)
+                                .setTitle(R.string.title_advanced_all_permissions)
+                                .setMessage(ssb)
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Do nothing
+                                    }
+                                })
+                                .show();
+                    }
+
+                    @Override
+                    protected void onException(Bundle args, Throwable ex) {
+                        Log.unexpectedError(getParentFragmentManager(), ex);
+                    }
+                }.execute(FragmentOptionsMisc.this, new Bundle(), "misc:permissions");
+            }
+        });
+
+        // Initialize
+        FragmentDialogTheme.setBackground(getContext(), view, false);
+
+        swPowerMenu.setVisibility(!BuildConfig.PLAY_STORE_RELEASE &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                ? View.VISIBLE : View.GONE);
+
+        tvFtsIndexed.setText(null);
+
+        swExternalAnswer.setVisibility(
+                ActivityAnswer.canAnswer(getContext()) ? View.VISIBLE : View.GONE);
+
+        DB db = DB.getInstance(getContext());
+        db.message().liveFts().observe(getViewLifecycleOwner(), new Observer<TupleFtsStats>() {
+            private TupleFtsStats last = null;
+
+            @Override
+            public void onChanged(TupleFtsStats stats) {
+                if (stats == null)
+                    tvFtsIndexed.setText(null);
+                else if (last == null || !last.equals(stats))
+                    tvFtsIndexed.setText(getString(R.string.title_advanced_fts_indexed,
+                            stats.fts,
+                            stats.total,
+                            Helper.humanReadableByteCount(FtsDbHelper.size(tvFtsIndexed.getContext()))));
+                last = stats;
+            }
+        });
+
+        grpUpdates.setVisibility(!BuildConfig.DEBUG &&
+                (Helper.isPlayStoreInstall() || !Helper.hasValidFingerprint(getContext()))
+                ? View.GONE : View.VISIBLE);
+        grpTest.setVisibility(BuildConfig.TEST_RELEASE ? View.VISIBLE : View.GONE);
+
+        setLastCleanup(prefs.getLong("last_cleanup", -1));
+
+        File external = getContext().getExternalFilesDir(null);
+        boolean emulated = (external != null && Environment.isExternalStorageEmulated(external));
+        tvExternalStorageFolder.setText(
+                (external == null ? null : external.getAbsolutePath()) + (emulated ? " emulated" : ""));
+
+        swExactAlarms.setEnabled(AlarmManagerCompatEx.canScheduleExactAlarms(getContext()));
+        swTestIab.setVisibility(BuildConfig.DEBUG && BuildConfig.TEST_RELEASE ? View.VISIBLE : View.GONE);
+
+        PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setContactInfo();
+        setSuffixes();
+        setPermissionInfo();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        resumed = true;
+
+        if (!Helper.isPlayStoreInstall() &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager nm = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+            NotificationChannel notification = nm.getNotificationChannel("update");
+            if (notification != null) {
+                boolean disabled = notification.getImportance() == NotificationManager.IMPORTANCE_NONE;
+                ibChannelUpdated.setImageLevel(disabled ? 0 : 1);
+                ibChannelUpdated.setVisibility(disabled ? View.VISIBLE : View.GONE);
+            }
+        }
+
+        View view = getView();
+        if (view != null)
+            view.post(new Runnable() {
+                @Override
+                public void run() {
+                    updateUsage();
+                }
+            });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        resumed = false;
+    }
+
+    @Override
+    public void onDestroyView() {
+        PreferenceManager.getDefaultSharedPreferences(getContext()).unregisterOnSharedPreferenceChangeListener(this);
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+            setOptions();
+            if ("last_cleanup".equals(key))
+                setLastCleanup(prefs.getLong(key, -1));
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_options, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_default) {
+            FragmentOptions.reset(getContext(), RESET_OPTIONS, null);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void onResetQuestions() {
+        final Context context = getContext();
+        View dview = LayoutInflater.from(context).inflate(R.layout.dialog_reset_questions, null);
+        final CheckBox cbGeneral = dview.findViewById(R.id.cbGeneral);
+        final CheckBox cbFull = dview.findViewById(R.id.cbFull);
+        final CheckBox cbImages = dview.findViewById(R.id.cbImages);
+        final CheckBox cbLinks = dview.findViewById(R.id.cbLinks);
+
+        new AlertDialog.Builder(context)
+                .setView(dview)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                        SharedPreferences.Editor editor = prefs.edit();
+
+                        if (cbGeneral.isChecked())
+                            for (String option : RESET_QUESTIONS)
+                                editor.remove(option);
+
+                        for (String key : prefs.getAll().keySet())
+                            if ((!BuildConfig.DEBUG &&
+                                    key.startsWith("translated_") && cbGeneral.isChecked()) ||
+                                    (key.endsWith(".show_full") && cbFull.isChecked()) ||
+                                    (key.endsWith(".show_images") && cbImages.isChecked()) ||
+                                    (key.endsWith(".confirm_link") && cbLinks.isChecked())) {
+                                Log.i("Removing option=" + key);
+                                editor.remove(key);
+                            }
+
+                        if (BuildConfig.DEBUG) {
+                            editor.remove("gmail_checked");
+                            editor.remove("outlook_checked");
+                        }
+
+                        editor.apply();
+
+                        ToastEx.makeText(context, R.string.title_setup_done, Toast.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void onCleanup() {
+        new SimpleTask<Void>() {
+            private Toast toast = null;
+
+            @Override
+            protected void onPreExecute(Bundle args) {
+                btnCleanup.setEnabled(false);
+                toast = ToastEx.makeText(getContext(), R.string.title_executing, Toast.LENGTH_LONG);
+                toast.show();
+            }
+
+            @Override
+            protected void onPostExecute(Bundle args) {
+                btnCleanup.setEnabled(true);
+                if (toast != null)
+                    toast.cancel();
+            }
+
+            @Override
+            protected Void onExecute(Context context, Bundle args) {
+                WorkerCleanup.cleanup(context, true);
+                return null;
+            }
+
+            @Override
+            protected void onExecuted(Bundle args, Void data) {
+                ToastEx.makeText(getContext(), R.string.title_completed, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            protected void onException(Bundle args, Throwable ex) {
+                Log.unexpectedError(getParentFragmentManager(), ex);
+            }
+        }.execute(this, new Bundle(), "cleanup:run");
+    }
+
+    private void setOptions() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        ActivityManager am = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        int class_mb = am.getMemoryClass();
+        int class_large_mb = am.getLargeMemoryClass();
+        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+        am.getMemoryInfo(mi);
+
+        swSortAnswers.setChecked(prefs.getBoolean("sort_answers", false));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+            swPowerMenu.setChecked(Helper.isComponentEnabled(getContext(), ServicePowerControl.class));
+        swExternalSearch.setChecked(Helper.isComponentEnabled(getContext(), ActivitySearch.class));
+        swExternalAnswer.setChecked(Helper.isComponentEnabled(getContext(), ActivityAnswer.class));
+        swShortcuts.setChecked(prefs.getBoolean("shortcuts", true));
+        swFts.setChecked(prefs.getBoolean("fts", false));
+
+        swClassification.setChecked(prefs.getBoolean("classification", false));
+
+        int class_min_chance = prefs.getInt("class_min_probability", 15);
+        tvClassMinProbability.setText(getString(R.string.title_advanced_class_min_chance, NF.format(class_min_chance)));
+        sbClassMinProbability.setProgress(class_min_chance);
+
+        int class_min_difference = prefs.getInt("class_min_difference", 50);
+        tvClassMinDifference.setText(getString(R.string.title_advanced_class_min_difference, NF.format(class_min_difference)));
+        sbClassMinDifference.setProgress(class_min_difference);
+
+        int selected = -1;
+        String language = prefs.getString("language", null);
+        List<String> display = new ArrayList<>();
+        display.add(getString(R.string.title_advanced_language_system));
+        for (int pos = 0; pos < languages.size(); pos++) {
+            Pair<String, String> lang = languages.get(pos);
+            display.add(lang.second);
+            if (lang.first.equals(language))
+                selected = pos + 1;
+        }
+
+        spLanguage.setTag(language);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, android.R.id.text1, display);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spLanguage.setAdapter(adapter);
+        if (selected >= 0)
+            spLanguage.setSelection(selected);
+
+        swDeepL.setChecked(prefs.getBoolean("deepl_enabled", false));
+        swUpdates.setChecked(prefs.getBoolean("updates", true));
+        swCheckWeekly.setChecked(prefs.getBoolean("weekly", Helper.hasPlayStore(getContext())));
+        swCheckWeekly.setEnabled(swUpdates.isChecked());
+        swChangelog.setChecked(prefs.getBoolean("show_changelog", !BuildConfig.PLAY_STORE_RELEASE));
+        swExperiments.setChecked(prefs.getBoolean("experiments", false));
+        swCrashReports.setChecked(prefs.getBoolean("crash_reports", false));
+        tvUuid.setText(prefs.getString("uuid", null));
+        swCleanupAttachments.setChecked(prefs.getBoolean("cleanup_attachments", false));
+
+        swWatchdog.setChecked(prefs.getBoolean("watchdog", true));
+        swProtocol.setChecked(prefs.getBoolean("protocol", false));
+        swLogInfo.setChecked(prefs.getInt("log_level", Log.getDefaultLogLevel()) <= android.util.Log.INFO);
+        swDebug.setChecked(prefs.getBoolean("debug", false));
+        swCanary.setChecked(prefs.getBoolean("leak_canary", false));
+        swTest1.setChecked(prefs.getBoolean("test1", false));
+        swTest2.setChecked(prefs.getBoolean("test2", false));
+        swTest3.setChecked(prefs.getBoolean("test3", false));
+        swTest4.setChecked(prefs.getBoolean("test4", false));
+        swTest5.setChecked(prefs.getBoolean("test5", false));
+
+        swAutostart.setChecked(Helper.isComponentEnabled(getContext(), ReceiverAutoStart.class));
+        swWorkManager.setChecked(prefs.getBoolean("work_manager", true));
+        swExternalStorage.setChecked(prefs.getBoolean("external_storage", false));
+
+        int query_threads = prefs.getInt("query_threads", DB.DEFAULT_QUERY_THREADS);
+        tvRoomQueryThreads.setText(getString(R.string.title_advanced_room_query_threads, NF.format(query_threads)));
+        sbRoomQueryThreads.setProgress(query_threads);
+
+        swWal.setChecked(prefs.getBoolean("wal", true));
+        swCheckpoints.setChecked(prefs.getBoolean("sqlite_checkpoints", false));
+        swAnalyze.setChecked(prefs.getBoolean("sqlite_analyze", true));
+
+        int sqlite_cache = prefs.getInt("sqlite_cache", DB.DEFAULT_CACHE_SIZE);
+        Integer cache_size = DB.getCacheSizeKb(getContext());
+        if (cache_size == null)
+            cache_size = 2000;
+        tvSqliteCache.setText(getString(R.string.title_advanced_sqlite_cache,
+                NF.format(sqlite_cache),
+                Helper.humanReadableByteCount(cache_size * 1024L)));
+        sbSqliteCache.setProgress(sqlite_cache);
+
+        int chunk_size = prefs.getInt("chunk_size", Core.DEFAULT_CHUNK_SIZE);
+        tvChunkSize.setText(getString(R.string.title_advanced_chunk_size, chunk_size));
+        sbChunkSize.setProgress(chunk_size);
+
+        int thread_range = prefs.getInt("thread_range", MessageHelper.DEFAULT_THREAD_RANGE);
+        int range = (int) Math.pow(2, thread_range);
+        tvThreadRange.setText(getString(R.string.title_advanced_thread_range, range));
+        sbThreadRange.setProgress(thread_range);
+
+        swUndoManager.setChecked(prefs.getBoolean("undo_manager", false));
+        swWebViewLegacy.setChecked(prefs.getBoolean("webview_legacy", false));
+        swBrowserZoom.setChecked(prefs.getBoolean("browser_zoom", false));
+        swModSeq.setChecked(prefs.getBoolean("use_modseq", true));
+        swUid.setChecked(prefs.getBoolean("uid_command", false));
+        swExpunge.setChecked(prefs.getBoolean("perform_expunge", true));
+        swUidExpunge.setChecked(prefs.getBoolean("uid_expunge", false));
+        swAuthPlain.setChecked(prefs.getBoolean("auth_plain", true));
+        swAuthLogin.setChecked(prefs.getBoolean("auth_login", true));
+        swAuthNtlm.setChecked(prefs.getBoolean("auth_ntlm", true));
+        swAuthSasl.setChecked(prefs.getBoolean("auth_sasl", true));
+        swAuthApop.setChecked(prefs.getBoolean("auth_apop", false));
+        swKeepAlivePoll.setChecked(prefs.getBoolean("keep_alive_poll", false));
+        swEmptyPool.setChecked(prefs.getBoolean("empty_pool", true));
+        swIdleDone.setChecked(prefs.getBoolean("idle_done", true));
+        swLogarithmicBackoff.setChecked(prefs.getBoolean("logarithmic_backoff", true));
+        swExactAlarms.setChecked(prefs.getBoolean("exact_alarms", true));
+        swInfra.setChecked(prefs.getBoolean("infra", false));
+        swDupMsgId.setChecked(prefs.getBoolean("dup_msgids", false));
+        swTestIab.setChecked(prefs.getBoolean("test_iab", false));
+
+        tvProcessors.setText(getString(R.string.title_advanced_processors, Runtime.getRuntime().availableProcessors()));
+        tvMemoryClass.setText(getString(R.string.title_advanced_memory_class,
+                class_mb + " MB",
+                class_large_mb + " MB",
+                Helper.humanReadableByteCount(mi.totalMem)));
+
+        String android_id;
+        try {
+            android_id = Settings.Secure.getString(
+                    getContext().getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+            if (android_id == null)
+                android_id = "<null>";
+        } catch (Throwable ex) {
+            Log.w(ex);
+            android_id = "?";
+        }
+        tvAndroidId.setText(getString(R.string.title_advanced_android_id, android_id));
+
+        tvFingerprint.setText(Helper.getFingerprint(getContext()));
+
+        int cursorWindowSize = -1;
+        try {
+            Field fCursorWindowSize = io.requery.android.database.CursorWindow.class.getDeclaredField("sDefaultCursorWindowSize");
+            fCursorWindowSize.setAccessible(true);
+            cursorWindowSize = fCursorWindowSize.getInt(null);
+        } catch (Throwable ex) {
+            Log.w(ex);
+        }
+        tvCursorWindow.setText(getString(R.string.title_advanced_cursor_window,
+                Helper.humanReadableByteCount(cursorWindowSize, false)));
+
+        cardDebug.setVisibility(swDebug.isChecked() || BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateUsage() {
+        if (!resumed)
+            return;
+
+        try {
+            Log.i("Update usage");
+
+            Bundle args = new Bundle();
+
+            new SimpleTask<StorageData>() {
+                @Override
+                protected StorageData onExecute(Context context, Bundle args) {
+                    StorageData data = new StorageData();
+                    Runtime rt = Runtime.getRuntime();
+                    data.hused = rt.totalMemory() - rt.freeMemory();
+                    data.hmax = rt.maxMemory();
+                    data.nheap = Debug.getNativeHeapAllocatedSize();
+                    data.available = Helper.getAvailableStorageSpace();
+                    data.total = Helper.getTotalStorageSpace();
+                    data.used = Helper.getSizeUsed(context.getFilesDir());
+                    data.cache_used = Helper.getSizeUsed(context.getCacheDir());
+                    data.cache_quota = Helper.getCacheQuota(context);
+                    return data;
+                }
+
+                @Override
+                protected void onExecuted(Bundle args, StorageData data) {
+                    tvMemoryUsage.setText(getString(R.string.title_advanced_memory_usage,
+                            Helper.humanReadableByteCount(data.hused),
+                            Helper.humanReadableByteCount(data.hmax),
+                            Helper.humanReadableByteCount(data.nheap)));
+
+                    tvStorageUsage.setText(getString(R.string.title_advanced_storage_usage,
+                            Helper.humanReadableByteCount(data.total - data.available),
+                            Helper.humanReadableByteCount(data.total),
+                            Helper.humanReadableByteCount(data.used)));
+                    tvCacheUsage.setText(getString(R.string.title_advanced_cache_usage,
+                            Helper.humanReadableByteCount(data.cache_used),
+                            Helper.humanReadableByteCount(data.cache_quota)));
+
+                    getView().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateUsage();
+                        }
+                    }, 2500);
+                }
+
+                @Override
+                protected void onException(Bundle args, Throwable ex) {
+                    Log.e(ex);
+                }
+            }.execute(this, args, "usage");
+        } catch (Throwable ex) {
+            Log.e(ex);
+        }
+    }
+
+    private void setLastCleanup(long time) {
+        java.text.DateFormat DTF = Helper.getDateTimeInstance(getContext());
+        tvLastCleanup.setText(
+                getString(R.string.title_advanced_last_cleanup,
+                        time < 0 ? "-" : DTF.format(time)));
+    }
+
+    private void setContactInfo() {
+        int[] stats = ContactInfo.getStats();
+        tvContactInfo.setText(getString(R.string.title_advanced_contact_info, stats[0], stats[1]));
+    }
+
+    private void setSuffixes() {
+        new SimpleTask<Integer>() {
+            @Override
+            protected void onPreExecute(Bundle args) {
+                tvSuffixes.setText(getString(R.string.title_advanced_suffixes, -1));
+            }
+
+            @Override
+            protected Integer onExecute(Context context, Bundle args) {
+                return UriHelper.getSuffixCount(context);
+            }
+
+            @Override
+            protected void onExecuted(Bundle args, Integer count) {
+                tvSuffixes.setText(getString(R.string.title_advanced_suffixes, count));
+            }
+
+            @Override
+            protected void onException(Bundle args, Throwable ex) {
+                Log.w(ex);
+                tvSuffixes.setText(ex.toString());
+            }
+        }.execute(this, new Bundle(), "suffixes");
+    }
+
+    private void setPermissionInfo() {
+        new SimpleTask<Spanned>() {
+            @Override
+            protected void onPreExecute(Bundle args) {
+                tvPermissions.setText(null);
+            }
+
+            @Override
+            protected Spanned onExecute(Context context, Bundle args) throws Throwable {
+                int start = 0;
+                int dp24 = Helper.dp2pixels(getContext(), 24);
+                SpannableStringBuilder ssb = new SpannableStringBuilderEx();
+                PackageManager pm = getContext().getPackageManager();
+                PackageInfo pi = pm.getPackageInfo(BuildConfig.APPLICATION_ID, PackageManager.GET_PERMISSIONS);
+                for (int i = 0; i < pi.requestedPermissions.length; i++) {
+                    boolean granted = ((pi.requestedPermissionsFlags[i] & PackageInfo.REQUESTED_PERMISSION_GRANTED) != 0);
+
+                    PermissionInfo info;
+                    try {
+                        info = pm.getPermissionInfo(pi.requestedPermissions[i], PackageManager.GET_META_DATA);
+                    } catch (Throwable ex) {
+                        info = new PermissionInfo();
+                        info.name = pi.requestedPermissions[i];
+                        if (!(ex instanceof PackageManager.NameNotFoundException))
+                            info.group = ex.toString();
+                    }
+
+                    ssb.append(info.name).append('\n');
+                    if (granted)
+                        ssb.setSpan(new StyleSpan(Typeface.BOLD), start, ssb.length(), 0);
+                    start = ssb.length();
+
+                    if (info.group != null) {
+                        ssb.append(info.group).append('\n');
+                        ssb.setSpan(new IndentSpan(dp24), start, ssb.length(), 0);
+                        start = ssb.length();
+                    }
+
+                    CharSequence description = info.loadDescription(pm);
+                    if (description != null) {
+                        ssb.append(description).append('\n');
+                        ssb.setSpan(new IndentSpan(dp24), start, ssb.length(), 0);
+                        ssb.setSpan(new RelativeSizeSpan(HtmlHelper.FONT_SMALL), start, ssb.length(), 0);
+                        start = ssb.length();
+                    }
+
+                    if (info.protectionLevel != 0) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                            switch (info.getProtection()) {
+                                case PermissionInfo.PROTECTION_DANGEROUS:
+                                    ssb.append("dangerous ");
+                                    break;
+                                case PermissionInfo.PROTECTION_NORMAL:
+                                    ssb.append("normal ");
+                                    break;
+                                case PermissionInfo.PROTECTION_SIGNATURE:
+                                    ssb.append("signature ");
+                                    break;
+                                case PermissionInfo.PROTECTION_SIGNATURE_OR_SYSTEM:
+                                    ssb.append("signatureOrSystem ");
+                                    break;
+                            }
+
+                        ssb.append(Integer.toHexString(info.protectionLevel));
+
+                        if (info.flags != 0)
+                            ssb.append(' ').append(Integer.toHexString(info.flags));
+
+                        ssb.append('\n');
+                        ssb.setSpan(new IndentSpan(dp24), start, ssb.length(), 0);
+                        start = ssb.length();
+                    }
+
+                    ssb.append('\n');
+                }
+
+                return ssb;
+            }
+
+            @Override
+            protected void onExecuted(Bundle args, Spanned permissions) {
+                tvPermissions.setText(permissions);
+            }
+
+            @Override
+            protected void onException(Bundle args, Throwable ex) {
+                Log.w(ex);
+                tvPermissions.setText(ex.toString());
+            }
+        }.execute(this, new Bundle(), "permissions");
+    }
+
+    private static class StorageData {
+        private long hused;
+        private long hmax;
+        private long nheap;
+        private long available;
+        private long total;
+        private long used;
+        private long cache_used;
+        private long cache_quota;
+    }
+}

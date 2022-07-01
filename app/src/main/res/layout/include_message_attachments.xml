@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eu.faircode.email.ConstraintLayoutEx xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:id="@+id/vSeparatorAttachments"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="3dp"
+        android:background="?attr/colorSeparator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/cbInline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="6dp"
+        android:text="@string/title_show_inline"
+        app:layout_constraintEnd_toStartOf="@+id/ibDownloadAttachments"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vSeparatorAttachments" />
+
+    <eu.faircode.email.FixedImageButton
+        android:id="@+id/ibDownloadAttachments"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/title_download_all"
+        android:padding="6dp"
+        android:scaleType="fitCenter"
+        android:tooltipText="@string/title_download_all"
+        app:layout_constraintEnd_toStartOf="@id/ibSaveAttachments"
+        app:layout_constraintTop_toBottomOf="@+id/vSeparatorAttachments"
+        app:srcCompat="@drawable/twotone_cloud_download_24" />
+
+    <eu.faircode.email.FixedImageButton
+        android:id="@+id/ibSaveAttachments"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/title_save_all"
+        android:padding="6dp"
+        android:scaleType="fitCenter"
+        android:tooltipText="@string/title_save_all"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vSeparatorAttachments"
+        app:srcCompat="@drawable/twotone_save_alt_24" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier_internet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="cbInline,ibSaveAttachments,ibDownloadAttachments" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAttachment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/barrier_internet" />
+
+    <eu.faircode.email.FixedTextView
+        android:id="@+id/tvNoInternetAttachments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:drawableStart="@drawable/twotone_warning_24"
+        android:drawablePadding="6dp"
+        android:text="@string/title_no_internet"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        app:layout_constraintEnd_toEndOf="@id/rvAttachment"
+        app:layout_constraintStart_toStartOf="@id/rvAttachment"
+        app:layout_constraintTop_toBottomOf="@id/rvAttachment" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/grpAttachments"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:constraint_referenced_ids="vSeparatorAttachments,rvAttachment" />
+</eu.faircode.email.ConstraintLayoutEx>
