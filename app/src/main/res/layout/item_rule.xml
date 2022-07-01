@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eu.faircode.email.FrameLayoutEx xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <eu.faircode.email.ViewCardOptional
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <eu.faircode.email.ConstraintLayoutEx
+            android:id="@+id/clItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/activatableItemBackground"
+            android:foreground="?attr/selectableItemBackground"
+            android:padding="6dp">
+
+            <eu.faircode.email.FixedTextView
+                android:id="@+id/tvName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:layout_constraintBottom_toBottomOf="@+id/ivStop"
+                app:layout_constraintEnd_toStartOf="@+id/tvOrder"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/ivStop" />
+
+            <eu.faircode.email.FixedTextView
+                android:id="@+id/tvOrder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:text="Order"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:layout_constraintBottom_toBottomOf="@+id/ivStop"
+                app:layout_constraintEnd_toStartOf="@+id/ivStop"
+                app:layout_constraintTop_toTopOf="@+id/ivStop" />
+
+            <eu.faircode.email.FixedImageView
+                android:id="@+id/ivStop"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/title_legend_stop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/twotone_stop_24" />
+
+            <eu.faircode.email.FixedTextView
+                android:id="@+id/tvCondition"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Condition"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvName" />
+
+            <eu.faircode.email.FixedTextView
+                android:id="@+id/tvAction"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Action"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvCondition" />
+
+            <eu.faircode.email.FixedTextView
+                android:id="@+id/tvLastApplied"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:text="Jan 1, 12:34"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintEnd_toStartOf="@id/tvApplied"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvAction" />
+
+            <eu.faircode.email.FixedTextView
+                android:id="@+id/tvApplied"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="123"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvAction" />
+        </eu.faircode.email.ConstraintLayoutEx>
+    </eu.faircode.email.ViewCardOptional>
+</eu.faircode.email.FrameLayoutEx>
